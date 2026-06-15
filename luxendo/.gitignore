@@ -1,0 +1,31 @@
+# Data and pipeline outputs
+raw/
+processed/
+*.n5/
+*.h5
+*.ims
+*.tif
+*.tiff
+
+# Large local dependencies
+tools/fiji/
+tools/BigStitcher-Spark/
+tools/BigStitcher-src/
+tools/multiview-reconstruction-src/
+tools/apache-maven-*/
+tools/downloads/
+tools/python/
+
+# Generated artifacts
+tools/java/classes/
+tools/tmp/
+tools/__pycache__/
+__pycache__/
+*.pyc
+*.class
+*.log
+*.exitcode
+*.pid
+
+# Packages and archives
+*.zip
