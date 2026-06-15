@@ -2,6 +2,8 @@
 
 Tools for converting Luxendo/BDV datasets into BigStitcher-Spark compatible N5 inputs, registering multiview/tiled acquisitions, fusing native or isotropic outputs, exporting BigTIFF, and exporting registered separate views for overlay/QA.
 
+> New machine? See [`INSTALL.md`](INSTALL.md) for from-scratch build/setup instructions (JDK, Maven, Fiji, Python).
+>
 > See [`docs/ANALYSIS.md`](docs/ANALYSIS.md) for how this pipeline relates to base BigStitcher-Spark and details of the affine registration capability.
 
 ## Current Pipeline

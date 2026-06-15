@@ -5,6 +5,7 @@ Created: 2026-06-14
 Included:
 
 - `README.md`
+- `INSTALL.md`
 - `DEPENDENCIES.md`
 - `requirements.txt`
 - `.gitignore`
