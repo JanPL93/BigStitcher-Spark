@@ -110,6 +110,46 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass `
   -DatasetRoot "D:\path\to\tiled_dataset"
 ```
 
+Tiled acquisition **with a BigTIFF export** of the fused volume:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass `
+  -File tools\run_pipeline.ps1 `
+  -DatasetRoot "D:\path\to\tiled_dataset" `
+  -ExportBigTiff
+```
+
+### BigTIFF export for tiled data
+
+By default the tiled pipeline writes only the fused multiresolution N5 (open
+`output\n5\full_isotropic_fused.n5` via its `bdv_xml\full_isotropic_fused.xml` in BigStitcher/BDV).
+Add `-ExportBigTiff` to also write a plain, **uncompressed `uint16` BigTIFF** of the full-resolution
+(`s0`) fused volume to `output\bigtiff\full_isotropic_fused_s0_bigtiff.tif`, with ImageJ/Bio-Formats
+voxel-size calibration baked in (so Fiji reports the correct micron spacing instead of pixels). A
+sidecar `...metadata.txt` records the calibration.
+
+Notes specific to tiled runs:
+
+- **File size.** The BigTIFF is uncompressed, so it is much larger than the zstd-compressed N5 — for
+  the example tiled run (`8504 x 6955 x 271`, `uint16`) that is roughly 32 GB on disk versus ~9 GB for
+  the N5. Make sure the output drive has room. BigTIFF (not classic TIFF) is used so volumes above the
+  4 GB TIFF limit are written correctly.
+- **One channel ⇒ one file.** A single-channel tiled dataset produces one BigTIFF. Multi-channel
+  datasets produce one BigTIFF per channel (named `..._ch<ID>_s0_bigtiff.tif`) plus a manifest.
+- **Already fused?** If the fused N5 already exists and you only want to add the BigTIFF without
+  rerunning registration/fusion, use `-OnlyExportBigTiff`:
+  ```powershell
+  powershell.exe -NoProfile -ExecutionPolicy Bypass `
+    -File tools\run_pipeline.ps1 `
+    -DatasetRoot "D:\path\to\tiled_dataset" `
+    -OutputRoot "D:\path\to\tiled_dataset\processed\<existing_run_folder>" `
+    -OnlyExportBigTiff
+  ```
+  (Pass the same `-OutputRoot` as the original run so it finds the existing fused N5.)
+- **Tuning the export.** `-BigTiffCompression` (default `Uncompressed`), `-BigTiffTileSize`
+  (default `128`), and `-BigTiffMemoryGb` (default `48`) control the writer. Raise `-BigTiffMemoryGb`
+  for very large volumes if the export runs short on heap.
+
 ## Output Layout
 
 Each run writes a timestamped `processed\bigstitcher_spark_HHMM_MMDDYYYY...` folder containing:
