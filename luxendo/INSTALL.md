@@ -152,7 +152,9 @@ tools\bigstitcher-spark.cmd resave
 Get-Help tools\run_pipeline.ps1 -Detailed   # or: powershell -File tools\run_pipeline.ps1 -?
 ```
 
-Then run on a dataset (folder containing `bdv.xml` + `bdv.h5`):
+Then run on a dataset. Point `-DatasetRoot` at the folder that contains `bdv.xml` + `bdv.h5`; if you
+point it at a subfolder (e.g. `...\raw`), the pipeline searches a few parent levels and uses the
+folder where `bdv.xml` is found.
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass `

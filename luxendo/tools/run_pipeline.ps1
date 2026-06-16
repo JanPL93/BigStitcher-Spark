@@ -67,6 +67,27 @@ if (-not (Test-Path -LiteralPath $datasetRoot)) {
     throw "Dataset root does not exist: $datasetRoot"
 }
 
+# Accept a dataset root that contains bdv.xml, or resolve it from a few parent levels (e.g. when the
+# caller points at a 'raw' subfolder whose bdv.xml/bdv.h5 live one level up).
+if (-not (Test-Path -LiteralPath (Join-Path $datasetRoot "bdv.xml"))) {
+    $searchDir = $datasetRoot
+    $resolvedRoot = $null
+    for ($depth = 0; $depth -lt 4 -and $searchDir; $depth++) {
+        if (Test-Path -LiteralPath (Join-Path $searchDir "bdv.xml")) {
+            $resolvedRoot = $searchDir
+            break
+        }
+        $searchDir = Split-Path -Parent $searchDir
+    }
+    if (-not $resolvedRoot) {
+        throw "Could not find bdv.xml in '$datasetRoot' or its parent folders. Point -DatasetRoot at the folder that contains bdv.xml and bdv.h5."
+    }
+    if ($resolvedRoot -ne $datasetRoot) {
+        Write-Host "Located bdv.xml in '$resolvedRoot' (resolved from '$datasetRoot'); using it as the dataset root."
+        $datasetRoot = $resolvedRoot
+    }
+}
+
 $toolsRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $outputRoot = if ($OutputRoot) {
     [System.IO.Path]::GetFullPath($OutputRoot)
@@ -371,8 +392,11 @@ function Get-SetupIdsForChannelFilter([string]$xmlPath, [string]$channelIds) {
 
 function Get-FusionChannels([string]$xmlPath) {
     [xml]$doc = Get-Content -LiteralPath $xmlPath -Raw
-    $channels = @($doc.SelectNodes("/SpimData/SequenceDescription/ViewSetups/Attributes[@name='channel']/*")) |
-        Sort-Object { [int]$_.id }
+    # Wrap the whole sorted pipeline in @(...) so a single channel stays a one-item array. Without
+    # the outer @(), PowerShell unrolls one piped item to a scalar XmlElement, so $channels.Count
+    # and the index loop below misbehave and emit no channels.
+    $channels = @(@($doc.SelectNodes("/SpimData/SequenceDescription/ViewSetups/Attributes[@name='channel']/*")) |
+        Sort-Object { [int]$_.id })
 
     if ($channels.Count -eq 0) {
         [PSCustomObject]@{
