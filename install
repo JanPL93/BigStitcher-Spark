@@ -138,6 +138,10 @@ install_command clear-interestpoints "net.preibisch.bigstitcher.spark.ClearInter
 install_command clear-registrations "net.preibisch.bigstitcher.spark.ClearRegistrations"
 install_command transform-points "net.preibisch.bigstitcher.spark.TransformPoints"
 
+echo 'Installing GUI ...'
+
+install_command gui "net.preibisch.bigstitcher.spark.gui.BigStitcherSparkGUI"
+
 
 if [ $(pwd) == "$INSTALL_DIR" ]; then
     echo "Installation directory equals current directory, we are done."

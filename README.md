@@ -57,6 +57,19 @@ If you run the code directly from your IDE, you will need to add JVM paramters f
 -Dspark.master=local[8] -Xmx50G
 ```
 
+### Graphical user interface (GUI)<a name="gui">
+
+If you prefer not to type command lines, `./install` also creates a `./gui` launcher that opens a small desktop application (Swing). It lets you:
+
+* browse to your BigStitcher project `.xml`,
+* pick any command and fill in its arguments through a form that is **pre-populated with the default values** (drop-downs for fixed choices, check-boxes for flags, text fields otherwise, with the documentation shown as a tool-tip), and
+* **queue multiple commands** that then run **sequentially**, each in its own JVM, while their console output is streamed live and per-task status (queued / running / done / failed) is shown.
+
+Each queued task is executed exactly like the corresponding shell command (`java -Xmx<mem>g -Dspark.master=local[<threads>] -cp <classpath> <CommandClass> <args>`), with the memory and thread count chosen at the top of the window. Start it with:
+```
+./gui
+```
+
 ### To run it on a compute cluster<a name="installcluster">
 
 `mvn clean package -P fatjar` builds `target/BigStitcher-Spark-0.0.1-SNAPSHOT.jar` for distribution.
