@@ -24,10 +24,34 @@ Additonally there are some utility methods:
 
 ***Note: BigStitcher-Spark is designed to work hand-in-hand with BigStitcher.** You can always verify the results of each step BigStitcher-Spark step interactively using BigStitcher by simply opening the XML. You can of course also run certain steps in BigStitcher, and others in BigStitcher-Spark. Not all functionality is 100% identical between BigStitcher and BigStitcher-Spark; important differences in terms of capabilities is described in the respective module documentation below (typically BigStitcher-Spark supports a specific feature that was hard to implement in BigStitcher and vice-versa).*
 
+## Quick Start<a name="quickstart">
+
+To get going on a local machine:
+
+1. **Install prerequisites:** **Java** ([Zulu JDK 8 + FX](https://www.azul.com/downloads/?version=java-8-lts&package=jdk-fx#zulu) is tested; **Java >=21 does not work** with the Spark version used) and **[Apache Maven](https://maven.apache.org)**. Set `JAVA_HOME` to point at that Java so Maven uses it. Verify with `java -version` and `mvn -v`.
+2. **Clone & build** (creates the command scripts and a `./gui` launcher in the working directory):
+   ```bash
+   git clone https://github.com/PreibischLab/BigStitcher-Spark
+   cd BigStitcher-Spark
+   ./install -t 8 -m 50          # cores and GB of RAM for local Spark execution
+   ```
+3. **Run** — either start the graphical application:
+   ```bash
+   ./gui                         # browse to your .xml, fill in a command, queue tasks, Run
+   ```
+   …or run a single command directly, e.g.:
+   ```bash
+   ./resave -x /path/to/dataset.xml
+   ```
+
+See [Install and Run](#install) for cluster/cloud setups and the [GUI](#gui) section for details on the graphical application.
+
 ## Content
 
+* [**Quick Start**](#quickstart)
 * [**Install and Run**](#install)
   * [Local](#installlocal)
+  * [Graphical User Interface (GUI)](#gui)
   * [Cluster](#installcluster)
   * [Cloud](#installcloud)
 * [**Example Datasets**](#examples)
@@ -65,10 +89,22 @@ If you prefer not to type command lines, `./install` also creates a `./gui` laun
 * pick any command and fill in its arguments through a form that is **pre-populated with the default values** (drop-downs for fixed choices, check-boxes for flags, text fields otherwise, with the documentation shown as a tool-tip), and
 * **queue multiple commands** that then run **sequentially**, each in its own JVM, while their console output is streamed live and per-task status (queued / running / done / failed) is shown.
 
-Each queued task is executed exactly like the corresponding shell command (`java -Xmx<mem>g -Dspark.master=local[<threads>] -cp <classpath> <CommandClass> <args>`), with the memory and thread count chosen at the top of the window. Start it with:
+Each queued task is executed exactly like the corresponding shell command (`java -Xmx<mem>g -Dspark.master=local[<threads>] -cp <classpath> <CommandClass> <args>`), with the memory and thread count chosen at the top of the window.
+
+**Install & launch:**
+
+1. Build as above with `./install -t <num-cores> -m <mem-in-GB>` — this also generates the `./gui` launcher.
+2. Start the application from the working directory:
+   ```
+   ./gui
+   ```
+3. In the window: **Browse** to your project `.xml`, pick a command (its arguments appear pre-filled with defaults), set the memory/threads at the top, **Add to queue** one or more commands, then **Run queue**.
+
+Alternatively, you can launch the GUI without the generated script — run the class directly on the build classpath:
 ```
-./gui
+java -cp "$JAR:$(cat cp.txt)" net.preibisch.bigstitcher.spark.gui.BigStitcherSparkGUI
 ```
+or simply run `net.preibisch.bigstitcher.spark.gui.BigStitcherSparkGUI` from your IDE (no JVM arguments are needed for the GUI itself — per-task memory and threads are set in the window).
 
 ### To run it on a compute cluster<a name="installcluster">
 
